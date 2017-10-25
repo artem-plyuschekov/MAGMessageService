@@ -8,14 +8,14 @@
 
 #import "MAGMessageService.h"
 #import "MAGSocketClient.h"
-#import "Reachability.h"
+#import "MAGReachability.h"
 
 @interface MAGMessageService() <MAGSocketClientDelegate>
 
 @property (nonatomic, strong) MAGSocketClient *socket;
 @property (nonatomic, assign) NSInteger reopenCounter;
-@property (nonatomic, strong) Reachability *hostReachability;
-@property (nonatomic, assign) NetworkStatus currentStatus;
+@property (nonatomic, strong) MAGReachability *hostReachability;
+@property (nonatomic, assign) MAGNetworkStatus currentStatus;
 @property (nonatomic, assign) BOOL isRun;
 
 @end
@@ -42,10 +42,10 @@
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(reachabilityChanged:)
-                                                     name:kReachabilityChangedNotification
+                                                     name:kMAGReachabilityChangedNotification
                                                    object:nil];
         
-        self.hostReachability = [Reachability reachabilityWithHostName:@"www.google.com"];
+        self.hostReachability = [MAGReachability reachabilityWithHostName:@"www.google.com"];
         [self.hostReachability startNotifier];
     }
     return self;
@@ -63,6 +63,7 @@
 }
 
 - (void)sendMessage:(NSDictionary *)message {
+    [self.queue pushMessage:message];
     [self.socket sendMessage:message];
 }
 
@@ -85,10 +86,10 @@
 }
 
 - (void)reachabilityChanged:(NSNotification *)note {
-    Reachability *curReach = [note object];
-    NSParameterAssert([curReach isKindOfClass:[Reachability class]]);
+    MAGReachability *curReach = [note object];
+    NSParameterAssert([curReach isKindOfClass:[MAGReachability class]]);
     
-    NetworkStatus status = [curReach currentReachabilityStatus];
+    MAGNetworkStatus status = [curReach currentReachabilityStatus];
     if (self.currentStatus == status || self.isRun == NO) {
         return;
     }
@@ -118,7 +119,6 @@
 }
 
 #pragma mark - <MAGSocketClientDelegate>
-
 
 - (void)didOpenSocketClient:(MAGSocketClient *)client {
     self.reopenCounter = 1;

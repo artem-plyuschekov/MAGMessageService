@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "MAGMessageQueue.h"
 
 @class MAGMessageService;
 
@@ -23,6 +24,7 @@ typedef void(^MAGMessageServiceConnectingHandler)(NSURL *url, NSString *token);
 @interface MAGMessageService : NSObject
 
 @property (weak, nonatomic) id<MAGMessageServiceDelegate> delegate;
+@property (strong, nonatomic) id<MAGMessageQueue> queue;
 
 - (void)start;
 - (void)stop;

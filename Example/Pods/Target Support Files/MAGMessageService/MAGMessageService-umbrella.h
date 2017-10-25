@@ -12,8 +12,9 @@
 
 #import "MAGMessageFrame.h"
 #import "MAGMessageService.h"
+#import "MAGReachability.h"
 #import "MAGSocketClient.h"
-#import "Reachability.h"
+#import "MAGMessageQueue.h"
 
 FOUNDATION_EXPORT double MAGMessageServiceVersionNumber;
 FOUNDATION_EXPORT const unsigned char MAGMessageServiceVersionString[];
