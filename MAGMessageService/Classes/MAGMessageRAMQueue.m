@@ -18,13 +18,29 @@
 }
 
 - (void)pushMessage:(NSDictionary *)message {
-    if (!message) {
+    if (message) {
         [self.messages addObject:message];
+        [[NSNotificationCenter defaultCenter] postNotificationName:kMAGMessageQueuePushMessage
+                                                            object:message];
     }
 }
 
 - (NSArray<NSDictionary*> *)getMessages; {
     return self.messages;
+}
+
+- (NSDictionary *)firstMessage {
+    return self.messages.firstObject;
+}
+
+- (void)removeFirstMessage {
+    if (self.messages.count > 0) {
+        [self.messages removeObjectAtIndex:0];
+    }
+}
+
+- (void)removeAllMessages {
+    [self.messages removeAllObjects];
 }
 
 @end

@@ -54,8 +54,8 @@
 
 - (void)messageService:(MAGMessageService *)service connectingHandler:(MAGMessageServiceConnectingHandler)handler {
     if (handler != nil) {
-        NSURL *url = [NSURL URLWithString:@"ws://127.0.0.1:8000"];
-        NSString *token = [[NSUUID UUID] UUIDString];
+        NSURL *url = [NSURL URLWithString:@"ws://demos.kaazing.com/echo"];
+        NSString *token = @"";
         handler(url, token);
     }
 }

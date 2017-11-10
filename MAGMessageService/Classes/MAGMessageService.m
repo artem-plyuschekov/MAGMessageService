@@ -8,6 +8,7 @@
 
 #import "MAGMessageService.h"
 #import "MAGSocketClient.h"
+#import "MAGMessageRAMQueue.h"
 
 @interface MAGMessageService() <MAGSocketClientDelegate>
 
@@ -16,6 +17,7 @@
 @property (nonatomic, strong) MAGReachability *hostReachability;
 @property (nonatomic, assign) MAGNetworkStatus currentStatus;
 @property (nonatomic, assign) BOOL isRun;
+@property (nonatomic, strong) id<MAGMessageQueue> messageQueue;
 
 @end
 
@@ -29,6 +31,7 @@
         _reopenCounter = 1;
         _currentStatus = NotReachable;
         _isRun = NO;
+        _messageQueue = [MAGMessageRAMQueue new];
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(didEnterBackground)
                                                      name:UIApplicationDidEnterBackgroundNotification
@@ -42,6 +45,11 @@
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(reachabilityChanged:)
                                                      name:kMAGReachabilityChangedNotification
+                                                   object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(messagePushedToQueue:)
+                                                     name:kMAGMessageQueuePushMessage
                                                    object:nil];
         
         self.hostReachability = [MAGReachability reachabilityWithHostName:@"www.google.com"];
@@ -62,8 +70,7 @@
 }
 
 - (void)sendMessage:(NSDictionary *)message {
-    [self.queue pushMessage:message];
-    [self.socket sendMessage:message];
+    [self.messageQueue pushMessage:message];
 }
 
 - (BOOL)setReachabilityHostName:(NSString *)hostName {
@@ -76,6 +83,10 @@
     [self.hostReachability stopNotifier];
     self.hostReachability = reachability;
     [self.hostReachability startNotifier];
+}
+
+- (void)setMessageQueue:(id<MAGMessageQueue>)queue {
+    self.messageQueue = queue;
 }
 
 #pragma mark - Privater
@@ -100,11 +111,14 @@
     NSParameterAssert([curReach isKindOfClass:[MAGReachability class]]);
     
     MAGNetworkStatus status = [curReach currentReachabilityStatus];
-    if (self.currentStatus == status || self.isRun == NO) {
+    if (self.currentStatus == status) {
         return;
     }
     
     self.currentStatus = status;
+    if (!self.isRun) {
+        return;
+    }
     switch (status) {
         case NotReachable:
             [self _stop];
@@ -113,6 +127,21 @@
         case ReachableViaWiFi:
             [self _start];
             break;
+    }
+}
+
+- (void)messagePushedToQueue:(NSNotification *)notification {
+    [self sendMessagesFromQueue];
+}
+
+- (void)sendMessagesFromQueue {
+    while ((self.currentStatus != NotReachable) && (self.isRun)) {
+        NSDictionary *message = [self.messageQueue firstMessage];
+        if (message == nil) {
+            break;
+        }
+        [self.socket sendMessage:message];
+        [self.messageQueue removeFirstMessage];
     }
 }
 
@@ -132,7 +161,10 @@
 
 - (void)didOpenSocketClient:(MAGSocketClient *)client {
     self.reopenCounter = 1;
-    [self.delegate messageServiceConnected:self];
+    if ([self.delegate respondsToSelector:@selector(messageServiceConnected:)]) {
+        [self.delegate messageServiceConnected:self];
+    }
+    [self sendMessagesFromQueue];
 }
 
 - (void)didCloseSocketClient:(MAGSocketClient *)client {
