@@ -1,5 +1,5 @@
 PODS:
-  - MAGMessageService (0.1.0):
+  - MAGMessageService (0.1.1):
     - SocketRocket (~> 0.5.1)
   - SocketRocket (0.5.1)
 
@@ -8,12 +8,12 @@ DEPENDENCIES:
 
 EXTERNAL SOURCES:
   MAGMessageService:
-    :path: "../"
+    :path: ../
 
 SPEC CHECKSUMS:
-  MAGMessageService: 6dffad6c966cdb76176b6a0315694d0dfb849511
+  MAGMessageService: fafefb71a66d020596597c546c14e40bbf695fb1
   SocketRocket: d57c7159b83c3c6655745cd15302aa24b6bae531
 
-PODFILE CHECKSUM: 9d1c3d022399a655336808f744e0961e24243b27
+PODFILE CHECKSUM: 4ccaf0d6e863a3e6eb88b990fd9377ab9a6a38ce
 
-COCOAPODS: 1.2.1
+COCOAPODS: 1.3.1

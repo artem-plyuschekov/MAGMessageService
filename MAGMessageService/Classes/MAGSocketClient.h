@@ -14,7 +14,7 @@
 extern NSString * const MAGSocketClientErrorDomian;
 
 typedef enum MAGErrorCode : NSInteger {
-
+    
     MAGErrorCodeUnknownCommand = 1001,
     MAGErrorCodeErrorCommand = 1002,
     MAGErrorCodeCantSerialize = 1003

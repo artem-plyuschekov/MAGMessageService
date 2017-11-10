@@ -8,8 +8,8 @@
 
 #import "MAGMessageFrame.h"
 
-const NSString *kCommandKey = @"command";
-const NSString *kPayloadKey = @"payload";
+static NSString *const kCommandKey = @"command";
+static NSString *const kPayloadKey = @"payload";
 
 @interface MAGMessageFrame()
     
@@ -41,7 +41,6 @@ const NSString *kPayloadKey = @"payload";
     }
     return self;
 }
-
 
 - (NSData *)data {
     NSError *localError = nil;

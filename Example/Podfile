@@ -6,7 +6,5 @@ target 'MAGMessageService_Example' do
 
   target 'MAGMessageService_Tests' do
     inherit! :search_paths
-
-    
   end
 end

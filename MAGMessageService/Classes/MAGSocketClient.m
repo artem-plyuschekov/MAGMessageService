@@ -60,7 +60,7 @@ CFAbsoluteTime serverActivity;
     NSLog(@"<<< MESSAGE");
     
     if (self.socket.readyState != SR_OPEN) {
-        NSLog(@"Can`t send message, socken be not open.");
+        NSLog(@"Can`t send message, socket be not open.");
         return;
     }
     
@@ -100,7 +100,7 @@ CFAbsoluteTime serverActivity;
     scanner.charactersToBeSkipped = [NSCharacterSet characterSetWithCharactersInString:@", "];
     [scanner scanInteger:&sx];
     [scanner scanInteger:&sy];
-
+    
     NSInteger pingTTL = ceil(sx / 1000);
     NSInteger pongTTL = ceil(sy / 1000);
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -152,12 +152,15 @@ CFAbsoluteTime serverActivity;
         [self.delegate socketClient:self receivedError:error];
     }
 }
-    
+
 #pragma mark - <SRWebSocketDelegate>
 
 
 - (void)webSocket:(SRWebSocket *)webSocket didReceiveMessage:(NSString *)message {
     serverActivity = CFAbsoluteTimeGetCurrent();
+    if (![message isKindOfClass: [NSString class]]) {
+        message = [[NSString alloc] initWithData:message encoding:NSUTF8StringEncoding];
+    }
     if ([message isEqualToString:BYTE_LF]) {
         NSLog(@">>> PING");
     } else {
@@ -189,6 +192,5 @@ CFAbsoluteTime serverActivity;
     NSLog(@">>> SERVER PONG");
     serverActivity = CFAbsoluteTimeGetCurrent();
 }
-
 
 @end

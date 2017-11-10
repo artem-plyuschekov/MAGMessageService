@@ -14,13 +14,13 @@
 
 #import <CoreFoundation/CoreFoundation.h>
 
-#import "Reachability.h"
+#import "MAGReachability.h"
 
 #pragma mark IPv6 Support
 //Reachability fully support IPv6.  For full details, see ReadMe.md.
 
 
-NSString *kReachabilityChangedNotification = @"kNetworkReachabilityChangedNotification";
+NSString *kMAGReachabilityChangedNotification = @"kMAGNetworkReachabilityChangedNotification";
 
 
 #pragma mark - Supporting functions
@@ -52,24 +52,24 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 {
 #pragma unused (target, flags)
 	NSCAssert(info != NULL, @"info was NULL in ReachabilityCallback");
-	NSCAssert([(__bridge NSObject*) info isKindOfClass: [Reachability class]], @"info was wrong class in ReachabilityCallback");
+	NSCAssert([(__bridge NSObject*) info isKindOfClass: [MAGReachability class]], @"info was wrong class in ReachabilityCallback");
 
-    Reachability* noteObject = (__bridge Reachability *)info;
+    MAGReachability* noteObject = (__bridge MAGReachability *)info;
     // Post a notification to notify the client that the network reachability changed.
-    [[NSNotificationCenter defaultCenter] postNotificationName: kReachabilityChangedNotification object: noteObject];
+    [[NSNotificationCenter defaultCenter] postNotificationName: kMAGReachabilityChangedNotification object: noteObject];
 }
 
 
 #pragma mark - Reachability implementation
 
-@implementation Reachability
+@implementation MAGReachability
 {
 	SCNetworkReachabilityRef _reachabilityRef;
 }
 
 + (instancetype)reachabilityWithHostName:(NSString *)hostName
 {
-	Reachability* returnValue = NULL;
+	MAGReachability* returnValue = NULL;
 	SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithName(NULL, [hostName UTF8String]);
 	if (reachability != NULL)
 	{
@@ -90,7 +90,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 {
 	SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithAddress(kCFAllocatorDefault, hostAddress);
 
-	Reachability* returnValue = NULL;
+	MAGReachability* returnValue = NULL;
 
 	if (reachability != NULL)
 	{
@@ -163,7 +163,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 #pragma mark - Network Flag Handling
 
-- (NetworkStatus)networkStatusForFlags:(SCNetworkReachabilityFlags)flags
+- (MAGNetworkStatus)networkStatusForFlags:(SCNetworkReachabilityFlags)flags
 {
 	PrintReachabilityFlags(flags, "networkStatusForFlags");
 	if ((flags & kSCNetworkReachabilityFlagsReachable) == 0)
@@ -172,7 +172,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 		return NotReachable;
 	}
 
-    NetworkStatus returnValue = NotReachable;
+    MAGNetworkStatus returnValue = NotReachable;
 
 	if ((flags & kSCNetworkReachabilityFlagsConnectionRequired) == 0)
 	{
@@ -224,10 +224,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 
-- (NetworkStatus)currentReachabilityStatus
+- (MAGNetworkStatus)currentReachabilityStatus
 {
 	NSAssert(_reachabilityRef != NULL, @"currentNetworkStatus called with NULL SCNetworkReachabilityRef");
-	NetworkStatus returnValue = NotReachable;
+	MAGNetworkStatus returnValue = NotReachable;
 	SCNetworkReachabilityFlags flags;
     
 	if (SCNetworkReachabilityGetFlags(_reachabilityRef, &flags))
