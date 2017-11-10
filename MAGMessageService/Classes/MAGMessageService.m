@@ -8,7 +8,6 @@
 
 #import "MAGMessageService.h"
 #import "MAGSocketClient.h"
-#import "MAGReachability.h"
 
 @interface MAGMessageService() <MAGSocketClientDelegate>
 
@@ -67,6 +66,17 @@
     [self.socket sendMessage:message];
 }
 
+- (BOOL)setReachabilityHostName:(NSString *)hostName {
+    [self.hostReachability stopNotifier];
+    self.hostReachability = [MAGReachability reachabilityWithHostName:hostName];
+    return [self.hostReachability startNotifier];
+}
+
+- (BOOL)setReachability:(MAGReachability *)reachability {
+    [self.hostReachability stopNotifier];
+    self.hostReachability = reachability;
+    [self.hostReachability startNotifier];
+}
 
 #pragma mark - Privater
 
@@ -122,6 +132,7 @@
 
 - (void)didOpenSocketClient:(MAGSocketClient *)client {
     self.reopenCounter = 1;
+    [self.delegate messageServiceConnected:self];
 }
 
 - (void)didCloseSocketClient:(MAGSocketClient *)client {

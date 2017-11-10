@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "MAGMessageQueue.h"
+#import "MAGReachability.h"
 
 @class MAGMessageService;
 
@@ -16,6 +17,8 @@ typedef void(^MAGMessageServiceConnectingHandler)(NSURL *url, NSString *token);
 @protocol MAGMessageServiceDelegate <NSObject>
 
 - (void)messageService:(MAGMessageService *)service connectingHandler:(MAGMessageServiceConnectingHandler)handler;
+@optional
+- (void)messageServiceConnected:(MAGMessageService *)service;
 - (void)messageService:(MAGMessageService *)service receivedMessage:(NSDictionary *)message;
 - (void)messageService:(MAGMessageService *)service receivedError:(NSError *)error;
 
@@ -29,4 +32,6 @@ typedef void(^MAGMessageServiceConnectingHandler)(NSURL *url, NSString *token);
 - (void)start;
 - (void)stop;
 - (void)sendMessage:(NSDictionary *)message;
+- (BOOL)setReachabilityHostName:(NSString *)hostName;
+- (BOOL)setReachability:(MAGReachability *)reachability;
 @end
